@@ -4,3 +4,4 @@ python-decouple==3.8
 setuptools>=68.0.0
 wheel>=0.40.0
 gunicorn==21.2.0
+whitenoise==6.5.0
