@@ -73,7 +73,11 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Database file path for persistent storage
-DB_PATH = os.getenv('DB_PATH', BASE_DIR / 'db.sqlite3')
+import sys
+if 'render' in sys.modules or os.getenv('RENDER'):
+    DB_PATH = '/var/data/db.sqlite3'
+else:
+    DB_PATH = BASE_DIR / 'db.sqlite3'
 
 DATABASES = {
     'default': {
