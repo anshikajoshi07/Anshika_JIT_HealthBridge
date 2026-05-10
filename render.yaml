@@ -8,9 +8,11 @@
       - key: DJANGO_SETTINGS_MODULE
         value: healthcare.settings
       - key: SECRET_KEY
-        value: your-secret-key-here
+        value: uq9id1Da-oSGt1IWwOHEncy4C6_VJkINFF5Hl67ma8DyjU-oCOXRzyDh8BRzBp6T5L4
       - key: DEBUG
         value: "False"
+      - key: RENDER
+        value: "1"
       - key: DB_PATH
         value: /var/data/db.sqlite3
     disk:
