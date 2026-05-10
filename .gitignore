@@ -18,6 +18,8 @@ var/
 wheels/
 pip-wheel-metadata/
 share/python-wheels/
+db.sqlite3
+db.sqlite3-journal
 *.egg-info/
 .installed.cfg
 *.egg
