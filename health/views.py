@@ -10,34 +10,29 @@ from .models import PatientProfile, DoctorProfile, Appointment
 
 def index(request):
     """Health app home page."""
-    try:
-        if request.user.is_authenticated:
-            if request.user.is_staff or request.user.is_superuser:
-                return redirect('health:admin_dashboard')
-            
-            # Try to determine user type by checking for doctor profile
-            try:
-                if hasattr(request.user, 'doctor_profile') and request.user.doctor_profile:
-                    return render(request, 'health/indexdoctor.html', {
-                        'title': 'HealthBridge - Doctor Dashboard'
-                    })
-            except:
-                pass
-            
-            return render(request, 'health/indexpatient.html', {
-                'title': 'HealthBridge - Your Dashboard'
+    if request.user.is_authenticated:
+        if request.user.is_staff or request.user.is_superuser:
+            return redirect('health:admin_dashboard')
+        
+        # Check if user has doctor profile
+        has_doctor_profile = False
+        try:
+            has_doctor_profile = hasattr(request.user, 'doctor_profile')
+        except Exception:
+            pass
+        
+        if has_doctor_profile:
+            return render(request, 'health/indexdoctor.html', {
+                'title': 'HealthBridge - Doctor Dashboard'
             })
+        
+        return render(request, 'health/indexpatient.html', {
+            'title': 'HealthBridge - Your Dashboard'
+        })
 
-        return render(request, 'health/index.html', {
-            'title': 'HealthBridge - Welcome'
-        })
-    except Exception as e:
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.error(f"Error in index view: {str(e)}", exc_info=True)
-        return render(request, 'health/index.html', {
-            'title': 'HealthBridge - Welcome'
-        })
+    return render(request, 'health/index.html', {
+        'title': 'HealthBridge - Welcome'
+    })
 
 
 @login_required
