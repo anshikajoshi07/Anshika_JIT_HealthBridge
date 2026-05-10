@@ -1,14 +1,19 @@
-services:
+﻿services:
   - type: web
     name: healthbridge
     runtime: python3
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt && python manage.py migrate --noinput && python manage.py collectstatic --noinput
-    # Use the Django project package name `healthcare` for gunicorn
     startCommand: gunicorn healthcare.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: healthcare.settings
       - key: SECRET_KEY
-        value: your-secret-key-here  # Replace with actual secret key
+        value: your-secret-key-here
       - key: DEBUG
-        value: False
+        value: "False"
+      - key: DB_PATH
+        value: /var/data/db.sqlite3
+    disk:
+      name: healthbridge_disk
+      mountPath: /var/data
+      sizeGB: 1
