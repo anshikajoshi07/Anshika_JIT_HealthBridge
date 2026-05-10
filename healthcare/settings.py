@@ -77,8 +77,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 import sys
 if 'render' in sys.modules or os.getenv('RENDER'):
     DB_PATH = '/var/data/db.sqlite3'
-    # Ensure directory exists
-    os.makedirs('/var/data', exist_ok=True)
 else:
     DB_PATH = BASE_DIR / 'db.sqlite3'
 
