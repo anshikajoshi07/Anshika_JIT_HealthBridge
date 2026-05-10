@@ -1,0 +1,348 @@
+{% extends 'basepatient.html' %}
+{% load static %}
+
+{% block title %}Book Appointment - HealthBridge{% endblock %}
+
+{% block content %}
+<div class="appointment-container">
+    <div class="appointment-header">
+        <h1>Book Your Appointment</h1>
+        <p>Schedule a consultation with your preferred healthcare professional.</p>
+    </div>
+
+    <form method="POST" class="appointment-form">
+        {% csrf_token %}
+
+        <!-- Doctor Selection -->
+        <div class="form-section">
+            <h2>👨‍⚕️ Select Doctor</h2>
+            {% if selected_doctor %}
+                <div class="selected-doctor-card">
+                    <div class="doctor-info">
+                        <h3>Dr. {{ selected_doctor.user.first_name }} {{ selected_doctor.user.last_name }}</h3>
+                        {% if selected_doctor.specialization %}
+                            <p>{{ selected_doctor.specialization }}</p>
+                        {% endif %}
+                        {% if selected_doctor.clinic_name %}
+                            <p>{{ selected_doctor.clinic_name }}</p>
+                        {% endif %}
+                        {% if selected_doctor.consultation_fee %}
+                            <p class="fee">₹{{ selected_doctor.consultation_fee }}</p>
+                        {% endif %}
+                    </div>
+                    <input type="hidden" name="doctor_id" value="{{ selected_doctor.id }}">
+                </div>
+            {% else %}
+                <div class="doctor-selection">
+                    <select name="doctor_id" required class="doctor-select">
+                        <option value="">Choose a doctor...</option>
+                        {% for doctor in doctors %}
+                            <option value="{{ doctor.id }}">
+                                Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}
+                                {% if doctor.specialization %} - {{ doctor.specialization }}{% endif %}
+                                {% if doctor.consultation_fee %} (₹{{ doctor.consultation_fee }}){% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Appointment Details -->
+        <div class="form-section">
+            <h2>📅 Appointment Details</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="appointment_date">Preferred Date *</label>
+                    <input type="date" id="appointment_date" name="appointment_date" required
+                           min="{% now 'Y-m-d' %}">
+                </div>
+                <div class="form-group">
+                    <label for="appointment_time">Preferred Time *</label>
+                    <select id="appointment_time" name="appointment_time" required>
+                        <option value="">Select time...</option>
+                        <option value="09:00">9:00 AM</option>
+                        <option value="09:30">9:30 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="10:30">10:30 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="11:30">11:30 AM</option>
+                        <option value="12:00">12:00 PM</option>
+                        <option value="12:30">12:30 PM</option>
+                        <option value="14:00">2:00 PM</option>
+                        <option value="14:30">2:30 PM</option>
+                        <option value="15:00">3:00 PM</option>
+                        <option value="15:30">3:30 PM</option>
+                        <option value="16:00">4:00 PM</option>
+                        <option value="16:30">4:30 PM</option>
+                        <option value="17:00">5:00 PM</option>
+                        <option value="17:30">5:30 PM</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reason for Visit -->
+        <div class="form-section">
+            <h2>📝 Reason for Visit</h2>
+            <div class="form-group">
+                <label for="reason">Please describe your symptoms or reason for consultation *</label>
+                <textarea id="reason" name="reason" rows="4" placeholder="Describe your health concern, symptoms, or reason for visiting the doctor..." required></textarea>
+            </div>
+        </div>
+
+        <!-- Patient Information -->
+        <div class="form-section">
+            <h2>👤 Patient Information</h2>
+            <div class="patient-info-card">
+                <div class="info-row">
+                    <span class="label">Name:</span>
+                    <span class="value">{{ user.first_name }} {{ user.last_name }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Email:</span>
+                    <span class="value">{{ user.email }}</span>
+                </div>
+                {% if patient_profile.phone %}
+                    <div class="info-row">
+                        <span class="label">Phone:</span>
+                        <span class="value">{{ patient_profile.phone }}</span>
+                    </div>
+                {% endif %}
+                {% if patient_profile.age %}
+                    <div class="info-row">
+                        <span class="label">Age:</span>
+                        <span class="value">{{ patient_profile.age }} years</span>
+                    </div>
+                {% endif %}
+                {% if patient_profile.blood_group %}
+                    <div class="info-row">
+                        <span class="label">Blood Group:</span>
+                        <span class="value">{{ patient_profile.blood_group }}</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+            <button type="submit" class="btn-submit">
+                📅 Confirm Appointment
+            </button>
+            <a href="{% url 'health:search_doctors' %}" class="btn-cancel">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.appointment-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1.25rem;
+}
+
+.appointment-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.appointment-header h1 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.appointment-header p {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.appointment-form {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+
+.form-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.form-section h2 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.selected-doctor-card {
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    border-left: 4px solid var(--secondary-color);
+}
+
+.doctor-info h3 {
+    color: var(--primary-color);
+    margin: 0 0 0.5rem 0;
+}
+
+.doctor-info p {
+    margin: 0.25rem 0;
+    color: #666;
+}
+
+.fee {
+    color: #27ae60;
+    font-weight: 600;
+}
+
+.doctor-select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.doctor-select:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.patient-info-card {
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.info-row:last-child {
+    margin-bottom: 0;
+}
+
+.label {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.value {
+    color: #495057;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.btn-submit, .btn-cancel {
+    display: inline-block;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease;
+    min-width: 150px;
+}
+
+.btn-submit {
+    background: var(--secondary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-submit:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.btn-cancel {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background: #5a6268;
+}
+
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .info-row {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+</style>
+{% endblock %}

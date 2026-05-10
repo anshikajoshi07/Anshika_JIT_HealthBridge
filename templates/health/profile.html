@@ -1,0 +1,405 @@
+{% extends 'basepatient.html' %}
+{% load static %}
+
+{% block title %}Profile - HealthBridge{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="profile-photo-section">
+            <div class="profile-photo-wrapper">
+                {% if patient_profile.profile_photo %}
+                    <img src="{{ patient_profile.profile_photo.url }}" alt="Profile Photo" class="profile-photo">
+                {% else %}
+                    <div class="default-profile-photo">
+                        <span>{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+                    </div>
+                {% endif %}
+                <button type="button" class="edit-photo-btn" onclick="document.getElementById('profile_photo').click()">
+                    <i class="camera-icon">📷</i>
+                </button>
+            </div>
+        </div>
+        <div class="profile-info">
+            <h1>{{ user.first_name|default:user.username }} {{ user.last_name }}</h1>
+            <p class="profile-email">{{ user.email }}</p>
+            {% if patient_profile.bio %}
+                <p class="profile-bio">{{ patient_profile.bio }}</p>
+            {% endif %}
+            <div class="profile-stats">
+                {% if patient_profile.age %}
+                    <span class="stat">Age: {{ patient_profile.age }}</span>
+                {% endif %}
+                {% if patient_profile.blood_group %}
+                    <span class="stat">Blood: {{ patient_profile.blood_group }}</span>
+                {% endif %}
+                {% if patient_profile.phone %}
+                    <span class="stat">Phone: {{ patient_profile.phone }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="profile-actions">
+            <button type="button" class="btn btn-primary edit-btn" onclick="toggleEditMode()">Edit Profile</button>
+            <a class="btn btn-secondary" href="{% url 'health:index' %}">Back to Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Edit Profile Form (Hidden by default) -->
+    <div id="edit-form" class="edit-form-container" style="display: none;">
+        <form method="POST" enctype="multipart/form-data" class="edit-form">
+            {% csrf_token %}
+            <h2>Edit Profile</h2>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="first_name">First Name</label>
+                    <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" placeholder="Enter first name">
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" placeholder="Enter last name">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="text" id="phone" name="phone" value="{{ patient_profile.phone }}" placeholder="Enter phone number">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" name="age" value="{{ patient_profile.age }}" placeholder="Enter age">
+                </div>
+                <div class="form-group">
+                    <label for="blood_group">Blood Group</label>
+                    <select id="blood_group" name="blood_group">
+                        <option value="">Select Blood Group</option>
+                        <option value="O+" {% if patient_profile.blood_group == 'O+' %}selected{% endif %}>O+</option>
+                        <option value="O-" {% if patient_profile.blood_group == 'O-' %}selected{% endif %}>O-</option>
+                        <option value="A+" {% if patient_profile.blood_group == 'A+' %}selected{% endif %}>A+</option>
+                        <option value="A-" {% if patient_profile.blood_group == 'A-' %}selected{% endif %}>A-</option>
+                        <option value="B+" {% if patient_profile.blood_group == 'B+' %}selected{% endif %}>B+</option>
+                        <option value="B-" {% if patient_profile.blood_group == 'B-' %}selected{% endif %}>B-</option>
+                        <option value="AB+" {% if patient_profile.blood_group == 'AB+' %}selected{% endif %}>AB+</option>
+                        <option value="AB-" {% if patient_profile.blood_group == 'AB-' %}selected{% endif %}>AB-</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="bio">Bio</label>
+                <textarea id="bio" name="bio" placeholder="Tell us about yourself..." rows="3">{{ patient_profile.bio }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="profile_photo">Profile Photo</label>
+                <input type="file" id="profile_photo" name="profile_photo" accept="image/*" style="display: none;">
+                <div class="file-input-wrapper">
+                    <button type="button" class="file-btn" onclick="document.getElementById('profile_photo').click()">
+                        Choose Photo
+                    </button>
+                    <span id="file-name">No file chosen</span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button type="button" class="btn btn-secondary" onclick="toggleEditMode()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function toggleEditMode() {
+    const form = document.getElementById('edit-form');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+document.getElementById('profile_photo').addEventListener('change', function(e) {
+    const fileName = e.target.files[0] ? e.target.files[0].name : 'No file chosen';
+    document.getElementById('file-name').textContent = fileName;
+});
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.profile-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1.25rem;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+    flex-wrap: wrap;
+}
+
+.profile-photo-section {
+    flex-shrink: 0;
+}
+
+.profile-photo-wrapper {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+
+.profile-photo, .default-profile-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--secondary-color);
+}
+
+.default-profile-photo {
+    background: linear-gradient(135deg, var(--secondary-color), #4f5b7b);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.edit-photo-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--secondary-color);
+    border: 3px solid white;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.edit-photo-btn:hover {
+    transform: scale(1.1);
+}
+
+.profile-info {
+    flex: 1;
+    min-width: 200px;
+}
+
+.profile-info h1 {
+    margin: 0 0 0.5rem 0;
+    color: var(--primary-color);
+    font-size: 2rem;
+}
+
+.profile-email {
+    color: #666;
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+}
+
+.profile-bio {
+    color: #444;
+    margin: 1rem 0;
+    font-style: italic;
+    line-height: 1.4;
+}
+
+.profile-stats {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.stat {
+    background: #f8f9fa;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.profile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+}
+
+.edit-btn {
+    background: var(--secondary-color);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.edit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.edit-form-container {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+
+.edit-form h2 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.file-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.file-btn {
+    background: #f8f9fa;
+    border: 2px dashed #ddd;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #666;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.file-btn:hover {
+    border-color: var(--secondary-color);
+    background: rgba(52, 152, 219, 0.05);
+}
+
+#file-name {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.85rem 1.5rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.btn-primary {
+    background: var(--secondary-color);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.btn-secondary {
+    background: #6c757d;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+
+    .profile-actions {
+        align-items: center;
+        width: 100%;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-stats {
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}

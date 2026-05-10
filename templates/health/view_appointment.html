@@ -1,0 +1,328 @@
+{% extends 'base.admin.html' %}
+{% load static %}
+
+{% block title %}View Appointment - HealthBridge Admin{% endblock %}
+
+{% block content %}
+<div class="view-container">
+    <div class="view-header">
+        <h1>Appointment Details</h1>
+        <div class="view-actions">
+            <a href="{% url 'health:edit_appointment' appointment.id %}" class="btn btn-primary">Edit Status</a>
+            {% if appointment.status == 'pending' %}
+                <a href="{% url 'health:approve_appointment' appointment.id %}" class="btn btn-success" onclick="return confirm('Approve this appointment?')">Approve</a>
+                <a href="{% url 'health:reject_appointment' appointment.id %}" class="btn btn-danger" onclick="return confirm('Reject this appointment?')">Reject</a>
+            {% endif %}
+            <a href="{% url 'health:view_appointments' %}" class="btn btn-secondary">Back to Appointments</a>
+        </div>
+    </div>
+
+    <div class="appointment-card">
+        <div class="appointment-header">
+            <div class="appointment-info">
+                <h2>Appointment #{{ appointment.id }}</h2>
+                <div class="status-badge status-{{ appointment.status }}">
+                    {{ appointment.status|title }}
+                </div>
+            </div>
+            <div class="appointment-date">
+                <div class="date">{{ appointment.appointment_date|date:"M d, Y" }}</div>
+                <div class="time">{{ appointment.appointment_time }}</div>
+            </div>
+        </div>
+
+        <div class="appointment-details">
+            <div class="detail-section">
+                <h3>Patient Information</h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <label>Name:</label>
+                        <span>{{ appointment.patient.user.first_name }} {{ appointment.patient.user.last_name }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Email:</label>
+                        <span>{{ appointment.patient.user.email }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Phone:</label>
+                        <span>{{ appointment.patient.phone|default:"Not provided" }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Age:</label>
+                        <span>{{ appointment.patient.age|default:"Not provided" }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Blood Group:</label>
+                        <span>{{ appointment.patient.blood_group|default:"Not provided" }}</span>
+                    </div>
+                </div>
+                <div class="detail-actions">
+                    <a href="{% url 'health:view_patient' appointment.patient.id %}" class="btn btn-sm btn-secondary">View Patient Profile</a>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h3>Doctor Information</h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <label>Name:</label>
+                        <span>Dr. {{ appointment.doctor.user.first_name }} {{ appointment.doctor.user.last_name }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Email:</label>
+                        <span>{{ appointment.doctor.user.email }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Specialization:</label>
+                        <span>{{ appointment.doctor.specialization|default:"Not provided" }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Clinic:</label>
+                        <span>{{ appointment.doctor.clinic_name|default:"Not provided" }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Consultation Fee:</label>
+                        <span>₹{{ appointment.doctor.consultation_fee|default:"Not set" }}</span>
+                    </div>
+                </div>
+                <div class="detail-actions">
+                    <a href="{% url 'health:view_doctor' appointment.doctor.id %}" class="btn btn-sm btn-secondary">View Doctor Profile</a>
+                </div>
+            </div>
+
+            {% if appointment.reason %}
+            <div class="detail-section">
+                <h3>Appointment Reason</h3>
+                <p>{{ appointment.reason }}</p>
+            </div>
+            {% endif %}
+
+            {% if appointment.notes %}
+            <div class="detail-section">
+                <h3>Additional Notes</h3>
+                <p>{{ appointment.notes }}</p>
+            </div>
+            {% endif %}
+
+            <div class="detail-section">
+                <h3>Appointment Timeline</h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <label>Created:</label>
+                        <span>{{ appointment.created_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Last Updated:</label>
+                        <span>{{ appointment.updated_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.view-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1.25rem;
+}
+
+.view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.view-header h1 {
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.view-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+}
+
+.btn-success {
+    background: #10b981;
+    color: white;
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.appointment-card {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+
+.appointment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem;
+    background: #f8fafc;
+    border-bottom: 1px solid #e5e7eb;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.appointment-info h2 {
+    margin: 0 0 0.5rem 0;
+    color: var(--primary-color);
+    font-size: 1.5rem;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-pending {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.status-confirmed {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.status-completed {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-cancelled {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.appointment-date {
+    text-align: right;
+}
+
+.appointment-date .date {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.appointment-date .time {
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.appointment-details {
+    padding: 2rem;
+}
+
+.detail-section {
+    margin-bottom: 2rem;
+}
+
+.detail-section h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.detail-item label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+}
+
+.detail-item span {
+    color: #111827;
+    padding: 0.5rem;
+    background: #f9fafb;
+    border-radius: 0.375rem;
+}
+
+.detail-actions {
+    margin-top: 1rem;
+}
+
+.detail-section p {
+    color: #374151;
+    line-height: 1.6;
+    background: #f9fafb;
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .appointment-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .appointment-date {
+        text-align: center;
+    }
+
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

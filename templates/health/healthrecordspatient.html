@@ -1,0 +1,125 @@
+{% extends 'basepatient.html' %}
+{% load static %}
+
+{% block title %}Health Records - HealthBridge{% endblock %}
+
+{% block content %}
+<div class="records-container">
+    <div class="records-header">
+        <h1>My Health Records</h1>
+        <p>Access your medical history, test results, and health documents.</p>
+    </div>
+
+    <div class="coming-soon">
+        <div class="coming-soon-icon">📋</div>
+        <h2>Health Records Feature</h2>
+        <p>This feature is coming soon! You'll be able to view your medical history, lab results, prescriptions, and other health documents here.</p>
+        <div class="feature-preview">
+            <div class="preview-item">
+                <h4>📊 Lab Results</h4>
+                <p>View your blood tests, X-rays, and other diagnostic reports.</p>
+            </div>
+            <div class="preview-item">
+                <h4>📈 Medical History</h4>
+                <p>Access your complete medical history and past treatments.</p>
+            </div>
+            <div class="preview-item">
+                <h4>📄 Health Documents</h4>
+                <p>Store and access important health documents securely.</p>
+            </div>
+        </div>
+        <a href="{% url 'health:index' %}" class="btn-back">← Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.records-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1.25rem;
+}
+
+.records-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.records-header h1 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.records-header p {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.coming-soon {
+    text-align: center;
+    background: white;
+    border-radius: 1rem;
+    padding: 3rem 2rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+
+.coming-soon-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.coming-soon h2 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.coming-soon p {
+    color: #666;
+    margin-bottom: 2rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.feature-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.preview-item {
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+.preview-item h4 {
+    color: var(--primary-color);
+    margin: 0 0 0.5rem 0;
+}
+
+.preview-item p {
+    color: #666;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.btn-back {
+    display: inline-block;
+    background: var(--secondary-color);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}

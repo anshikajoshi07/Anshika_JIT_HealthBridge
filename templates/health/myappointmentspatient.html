@@ -1,0 +1,437 @@
+{% extends 'basepatient.html' %}
+{% load static %}
+
+{% block title %}My Appointments - HealthBridge{% endblock %}
+
+{% block content %}
+<div class="appointments-container">
+    <div class="appointments-header">
+        <h1>My Appointments</h1>
+        <p>View and manage your upcoming and past appointments.</p>
+        <a href="{% url 'health:book_appointment' %}" class="btn-book-new">
+            📅 Book New Appointment
+        </a>
+    </div>
+
+    {% if appointments %}
+        <div class="appointments-list">
+            {% for appointment in appointments %}
+                <div class="appointment-card {% if appointment.status == 'completed' %}completed{% elif appointment.status == 'cancelled' %}cancelled{% endif %}">
+                    <div class="appointment-header">
+                        <div class="doctor-info">
+                            <h3>Dr. {{ appointment.doctor.user.first_name }} {{ appointment.doctor.user.last_name }}</h3>
+                            {% if appointment.doctor.specialization %}
+                                <p>{{ appointment.doctor.specialization }}</p>
+                            {% endif %}
+                            {% if appointment.doctor.clinic_name %}
+                                <p>{{ appointment.doctor.clinic_name }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="appointment-status status-{{ appointment.status }}">
+                            {{ appointment.status|title }}
+                        </div>
+                    </div>
+
+                    <div class="appointment-details">
+                        <div class="detail-row">
+                            <span class="label">📅 Date:</span>
+                            <span class="value">{{ appointment.appointment_date|date:"l, F j, Y" }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">🕒 Time:</span>
+                            <span class="value">{{ appointment.appointment_time|time:"g:i A" }}</span>
+                        </div>
+                        {% if appointment.reason %}
+                            <div class="detail-row">
+                                <span class="label">📝 Reason:</span>
+                                <span class="value">{{ appointment.reason }}</span>
+                            </div>
+                        {% endif %}
+                        <div class="detail-row">
+                            <span class="label">📞 Contact:</span>
+                            <span class="value">{{ appointment.doctor.phone|default:"Not provided" }}</span>
+                        </div>
+                    </div>
+
+                    {% if appointment.status == 'pending' %}
+                        <div class="appointment-actions">
+                            <button class="btn-reschedule" onclick="alert('Reschedule feature coming soon!')">🔄 Reschedule</button>
+                            <button class="btn-cancel" onclick="alert('Cancel feature coming soon!')">❌ Cancel</button>
+                        </div>
+                    {% endif %}
+
+                    {% if appointment.notes %}
+                        <div class="appointment-notes">
+                            <h4>Doctor's Notes</h4>
+                            <p>{{ appointment.notes }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-appointments">
+            <div class="no-appointments-icon">📅</div>
+            <h2>No Appointments Yet</h2>
+            <p>You haven't booked any appointments yet. Start by finding a doctor and scheduling your first consultation.</p>
+            <div class="no-appointments-actions">
+                <a href="{% url 'health:search_doctors' %}" class="btn-primary">🔍 Search Doctors</a>
+                <a href="{% url 'health:book_appointment' %}" class="btn-secondary">📅 Book Appointment</a>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Appointment Stats -->
+    {% if appointments %}
+        <div class="appointment-stats">
+            <h2>Appointment Summary</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">{{ appointments|length }}</div>
+                    <div class="stat-label">Total Appointments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ appointments|length|add:"0" }}</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ appointments|length|add:"0" }}</div>
+                    <div class="stat-label">Upcoming</div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.appointments-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1.25rem;
+}
+
+.appointments-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.appointments-header h1 {
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.appointments-header p {
+    color: #666;
+    margin: 0.5rem 0 0 0;
+    flex: 1;
+}
+
+.btn-book-new {
+    background: var(--secondary-color);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-book-new:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.appointments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.appointment-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    border: 1px solid #e9ecef;
+    transition: transform 0.3s ease;
+}
+
+.appointment-card:hover {
+    transform: translateY(-2px);
+}
+
+.appointment-card.completed {
+    border-left: 4px solid #27ae60;
+    background: #f8fff9;
+}
+
+.appointment-card.cancelled {
+    border-left: 4px solid #e74c3c;
+    background: #fff8f8;
+}
+
+.appointment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.doctor-info h3 {
+    color: var(--primary-color);
+    margin: 0 0 0.5rem 0;
+}
+
+.doctor-info p {
+    margin: 0.25rem 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.appointment-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-confirmed {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-cancelled {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.appointment-details {
+    margin-bottom: 1rem;
+}
+
+.detail-row {
+    display: flex;
+    margin-bottom: 0.5rem;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.detail-row:last-child {
+    margin-bottom: 0;
+}
+
+.label {
+    font-weight: 600;
+    color: var(--primary-color);
+    min-width: 80px;
+}
+
+.value {
+    color: #495057;
+    flex: 1;
+}
+
+.appointment-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-reschedule, .btn-cancel {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.btn-reschedule {
+    background: #ffc107;
+    color: #212529;
+}
+
+.btn-reschedule:hover {
+    background: #e0a800;
+}
+
+.btn-cancel {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background: #c82333;
+}
+
+.appointment-notes {
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.appointment-notes h4 {
+    color: var(--primary-color);
+    margin: 0 0 0.5rem 0;
+}
+
+.appointment-notes p {
+    color: #495057;
+    margin: 0;
+}
+
+.no-appointments {
+    text-align: center;
+    background: white;
+    border-radius: 1rem;
+    padding: 3rem 2rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+
+.no-appointments-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.no-appointments h2 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.no-appointments p {
+    color: #666;
+    margin-bottom: 2rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.no-appointments-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-primary, .btn-secondary {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+.appointment-stats {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+
+.appointment-stats h2 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .appointments-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .appointment-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .detail-row {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .appointment-actions {
+        flex-direction: column;
+    }
+
+    .no-appointments-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

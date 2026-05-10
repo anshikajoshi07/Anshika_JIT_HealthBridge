@@ -1,0 +1,344 @@
+{% extends 'basepatient.html' %}
+{% load static %}
+
+{% block title %}Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }} - HealthBridge{% endblock %}
+
+{% block content %}
+<div class="doctor-detail-container">
+    <!-- Doctor Profile Header -->
+    <div class="doctor-profile-header">
+        <div class="doctor-photo-large">
+            {% if doctor.profile_photo %}
+                <img src="{{ doctor.profile_photo.url }}" alt="Dr. {{ doctor.user.first_name }}">
+            {% else %}
+                <div class="default-doctor-photo-large">
+                    <span>Dr. {{ doctor.user.first_name|first|upper }}{{ doctor.user.last_name|first|upper }}</span>
+                </div>
+            {% endif %}
+        </div>
+        <div class="doctor-details">
+            <h1>Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</h1>
+            {% if doctor.specialization %}
+                <p class="specialization">{{ doctor.specialization }}</p>
+            {% endif %}
+            {% if doctor.clinic_name %}
+                <p class="clinic">{{ doctor.clinic_name }}</p>
+            {% endif %}
+            <div class="doctor-meta">
+                {% if doctor.experience %}
+                    <span class="meta-item">📅 {{ doctor.experience }} years experience</span>
+                {% endif %}
+                {% if doctor.consultation_fee %}
+                    <span class="meta-item">💰 ₹{{ doctor.consultation_fee }}</span>
+                {% endif %}
+                {% if doctor.phone %}
+                    <span class="meta-item">📞 {{ doctor.phone }}</span>
+                {% endif %}
+            </div>
+            {% if doctor.bio %}
+                <div class="doctor-bio">
+                    <h3>About Doctor</h3>
+                    <p>{{ doctor.bio }}</p>
+                </div>
+            {% endif %}
+        </div>
+        <div class="doctor-actions">
+            <a href="{% url 'health:book_appointment_with_doctor' doctor.id %}" class="btn-book-appointment">
+                📅 Book Appointment
+            </a>
+            <a href="{% url 'health:search_doctors' %}" class="btn-back">
+                ← Back to Search
+            </a>
+        </div>
+    </div>
+
+    <!-- Doctor Information Cards -->
+    <div class="doctor-info-grid">
+        {% if doctor.available_days %}
+            <div class="info-card">
+                <h3>📅 Available Days</h3>
+                <p>{{ doctor.available_days }}</p>
+            </div>
+        {% endif %}
+
+        {% if doctor.available_time_start and doctor.available_time_end %}
+            <div class="info-card">
+                <h3>🕒 Available Hours</h3>
+                <p>{{ doctor.available_time_start|time:"H:i" }} - {{ doctor.available_time_end|time:"H:i" }}</p>
+            </div>
+        {% endif %}
+
+        {% if doctor.license_number %}
+            <div class="info-card">
+                <h3>📋 License Number</h3>
+                <p>{{ doctor.license_number }}</p>
+            </div>
+        {% endif %}
+
+        <div class="info-card">
+            <h3>⭐ Rating</h3>
+            <p>4.8/5 (Based on 127 reviews)</p>
+        </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="reviews-section">
+        <h2>Patient Reviews</h2>
+        <div class="reviews-list">
+            <div class="review-card">
+                <div class="review-header">
+                    <span class="reviewer-name">Rajesh Kumar</span>
+                    <div class="review-rating">⭐⭐⭐⭐⭐</div>
+                </div>
+                <p class="review-text">Excellent doctor! Very knowledgeable and caring. The consultation was thorough and I felt well taken care of.</p>
+                <span class="review-date">2 weeks ago</span>
+            </div>
+
+            <div class="review-card">
+                <div class="review-header">
+                    <span class="reviewer-name">Priya Sharma</span>
+                    <div class="review-rating">⭐⭐⭐⭐⭐</div>
+                </div>
+                <p class="review-text">Dr. {{ doctor.user.first_name }} is very professional and explains everything clearly. Highly recommended!</p>
+                <span class="review-date">1 month ago</span>
+            </div>
+
+            <div class="review-card">
+                <div class="review-header">
+                    <span class="reviewer-name">Amit Singh</span>
+                    <div class="review-rating">⭐⭐⭐⭐⭐</div>
+                </div>
+                <p class="review-text">Great experience! The doctor listened to all my concerns and provided the best treatment plan.</p>
+                <span class="review-date">6 weeks ago</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.doctor-detail-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1.25rem;
+}
+
+.doctor-profile-header {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+    margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 2rem;
+    align-items: start;
+}
+
+.doctor-photo-large {
+    text-align: center;
+}
+
+.doctor-photo-large img, .default-doctor-photo-large {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--secondary-color);
+}
+
+.default-doctor-photo-large {
+    background: linear-gradient(135deg, var(--secondary-color), #4f5b7b);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.doctor-details h1 {
+    color: var(--primary-color);
+    margin: 0 0 0.5rem 0;
+    font-size: 2.5rem;
+}
+
+.specialization {
+    color: var(--secondary-color);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+}
+
+.clinic {
+    color: #666;
+    font-size: 1.1rem;
+    margin: 0 0 1rem 0;
+}
+
+.doctor-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.meta-item {
+    background: #f8f9fa;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: #495057;
+}
+
+.doctor-bio {
+    margin-top: 1rem;
+}
+
+.doctor-bio h3 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.doctor-bio p {
+    color: #666;
+    line-height: 1.6;
+}
+
+.doctor-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 200px;
+}
+
+.btn-book-appointment, .btn-back {
+    display: inline-block;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.btn-book-appointment {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.btn-book-appointment:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.btn-back {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-back:hover {
+    background: #5a6268;
+}
+
+.doctor-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.info-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    border: 1px solid #e9ecef;
+}
+
+.info-card h3 {
+    color: var(--primary-color);
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.info-card p {
+    color: #666;
+    margin: 0;
+}
+
+.reviews-section {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+
+.reviews-section h2 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+}
+
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.review-card {
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    border-left: 4px solid var(--secondary-color);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.reviewer-name {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.review-rating {
+    font-size: 1rem;
+}
+
+.review-text {
+    color: #495057;
+    margin: 0.5rem 0;
+    line-height: 1.5;
+}
+
+.review-date {
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+    .doctor-profile-header {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 1.5rem;
+    }
+
+    .doctor-actions {
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .doctor-details h1 {
+        font-size: 2rem;
+    }
+
+    .doctor-meta {
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}

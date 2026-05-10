@@ -1,0 +1,91 @@
+{% extends 'basedoctor.html' %}
+{% load static %}
+
+{% block title %}Doctor Appointments - HealthBridge{% endblock %}
+
+{% block content %}
+<div class="appointments-container">
+    <div class="section-header">
+        <h1>My Appointments</h1>
+        <p>Manage your upcoming patient consultations.</p>
+    </div>
+
+    {% if appointments %}
+        <div class="appointments-list">
+            {% for appointment in appointments %}
+                <div class="appointment-card">
+                    <h3>{{ appointment.patient.user.first_name }} {{ appointment.patient.user.last_name }}</h3>
+                    <p><strong>Appointment:</strong> {{ appointment.appointment_date }} at {{ appointment.appointment_time }}</p>
+                    <p><strong>Status:</strong> {{ appointment.status|capfirst }}</p>
+                    {% if appointment.reason %}<p><strong>Reason:</strong> {{ appointment.reason }}</p>{% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>No appointments found</h3>
+            <p>You don't have any appointments yet. Share your availability and ask patients to book you.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.appointments-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1.25rem;
+}
+
+.section-header h1 {
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.section-header p {
+    color: #555;
+    margin: 0;
+}
+
+.appointments-list {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.appointment-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.appointment-card h3 {
+    margin-top: 0;
+    color: var(--secondary-color);
+}
+
+.appointment-card p {
+    margin: 0.4rem 0;
+    color: #444;
+}
+
+.empty-state {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.empty-state h3 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: #666;
+}
+</style>
+{% endblock %}

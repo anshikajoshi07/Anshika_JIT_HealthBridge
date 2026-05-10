@@ -1,0 +1,390 @@
+{% extends 'basedoctor.html' %}
+{% load static %}
+
+{% block title %}Doctor Profile - HealthBridge{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="profile-photo-section">
+            <div class="profile-photo-wrapper">
+                {% if doctor_profile.profile_photo %}
+                    <img src="{{ doctor_profile.profile_photo.url }}" alt="Dr. {{ user.first_name }}" class="profile-photo">
+                {% else %}
+                    <div class="default-profile-photo">
+                        <span>{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+                    </div>
+                {% endif %}
+                <button type="button" class="edit-photo-btn" onclick="document.getElementById('profile_photo').click()">
+                    <i class="camera-icon">📷</i>
+                </button>
+            </div>
+        </div>
+
+        <div class="profile-info">
+            <h1>Dr. {{ user.first_name }} {{ user.last_name }}</h1>
+            <p class="profile-email">{{ user.email }}</p>
+            {% if doctor_profile.specialization %}
+                <p class="profile-bio">{{ doctor_profile.specialization }}</p>
+            {% endif %}
+            <div class="profile-stats">
+                {% if doctor_profile.clinic_name %}
+                    <span class="stat">Clinic: {{ doctor_profile.clinic_name }}</span>
+                {% endif %}
+                {% if doctor_profile.experience %}
+                    <span class="stat">Experience: {{ doctor_profile.experience }} yrs</span>
+                {% endif %}
+                {% if doctor_profile.consultation_fee %}
+                    <span class="stat">Fee: ₹{{ doctor_profile.consultation_fee }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="profile-actions">
+            <button type="button" class="btn btn-primary edit-btn" onclick="toggleEditMode()">Edit Profile</button>
+            <a class="btn btn-secondary" href="{% url 'health:index' %}">Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div id="edit-form" class="edit-form-container" style="display: none;">
+        <form method="POST" enctype="multipart/form-data" class="edit-form">
+            {% csrf_token %}
+            <h2>Edit Profile</h2>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="first_name">First Name</label>
+                    <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" placeholder="Enter first name" required>
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" placeholder="Enter last name" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="text" id="phone" name="phone" value="{{ doctor_profile.phone }}" placeholder="Enter phone number">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="specialization">Specialization</label>
+                    <input type="text" id="specialization" name="specialization" value="{{ doctor_profile.specialization }}" placeholder="e.g. Cardiology">
+                </div>
+                <div class="form-group">
+                    <label for="license_number">License Number</label>
+                    <input type="text" id="license_number" name="license_number" value="{{ doctor_profile.license_number }}" placeholder="Enter license number">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="clinic_name">Clinic Name</label>
+                    <input type="text" id="clinic_name" name="clinic_name" value="{{ doctor_profile.clinic_name }}" placeholder="Enter clinic name">
+                </div>
+                <div class="form-group">
+                    <label for="experience">Experience</label>
+                    <input type="number" id="experience" name="experience" value="{{ doctor_profile.experience }}" min="0" placeholder="Years of experience">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="consultation_fee">Consultation Fee</label>
+                    <input type="text" id="consultation_fee" name="consultation_fee" value="{{ doctor_profile.consultation_fee }}" placeholder="Enter fee">
+                </div>
+                <div class="form-group">
+                    <label for="available_days">Available Days</label>
+                    <input type="text" id="available_days" name="available_days" value="{{ doctor_profile.available_days }}" placeholder="e.g. Mon, Tue">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="available_time_start">Start Time</label>
+                    <input type="time" id="available_time_start" name="available_time_start" value="{{ doctor_profile.available_time_start }}">
+                </div>
+                <div class="form-group">
+                    <label for="available_time_end">End Time</label>
+                    <input type="time" id="available_time_end" name="available_time_end" value="{{ doctor_profile.available_time_end }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="bio">About You</label>
+                <textarea id="bio" name="bio" placeholder="Tell patients about your practice..." rows="3">{{ doctor_profile.bio }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="profile_photo">Profile Photo</label>
+                <input type="file" id="profile_photo" name="profile_photo" accept="image/*" style="display: none;">
+                <div class="file-input-wrapper">
+                    <button type="button" class="file-btn" onclick="document.getElementById('profile_photo').click()">
+                        Choose Photo
+                    </button>
+                    <span id="file-name">No file chosen</span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button type="button" class="btn btn-secondary" onclick="toggleEditMode()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.profile-container {
+    max-width: 960px;
+    margin: 2rem auto;
+}
+
+.profile-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1.5rem;
+    align-items: center;
+    padding: 2rem;
+    background: #ffffff;
+    border-radius: 1.25rem;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+}
+
+.profile-photo-wrapper {
+    position: relative;
+    width: 150px;
+    height: 150px;
+}
+
+.profile-photo,
+.default-profile-photo {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid #eef2ff;
+    background: #eef2ff;
+}
+
+.default-profile-photo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    background: linear-gradient(135deg, #6366f1, #3b82f6);
+}
+
+.edit-photo-btn {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 3px solid #ffffff;
+    background: #4f46e5;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: transform 0.2s ease;
+}
+
+.edit-photo-btn:hover {
+    transform: scale(1.05);
+}
+
+.profile-info h1 {
+    margin: 0;
+    font-size: 2.25rem;
+    color: #111827;
+}
+
+.profile-email {
+    margin: 0.5rem 0 0.9rem;
+    color: #4b5563;
+    font-size: 1rem;
+}
+
+.profile-bio {
+    margin: 0;
+    color: #374151;
+    line-height: 1.7;
+    max-width: 680px;
+}
+
+.profile-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+.stat {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.65rem 1rem;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #1d4ed8;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.profile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    justify-content: center;
+}
+
+.profile-actions .btn {
+    min-width: 160px;
+}
+
+.profile-actions .btn-primary {
+    background: #2563eb;
+    border: none;
+}
+
+.profile-actions .btn-secondary {
+    background: #10b981;
+    border: none;
+}
+
+.edit-form-container {
+    margin-top: 1.75rem;
+    padding: 1.85rem;
+    background: #ffffff;
+    border-radius: 1.25rem;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+}
+
+.edit-form h2 {
+    margin: 0 0 1.4rem;
+    font-size: 1.6rem;
+    color: #111827;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #374151;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.9rem;
+    background: #f8fafc;
+    color: #111827;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.14);
+    background: #ffffff;
+}
+
+.file-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.file-btn {
+    border: none;
+    padding: 0.85rem 1rem;
+    border-radius: 0.9rem;
+    background: #2563eb;
+    color: #ffffff;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.file-btn:hover {
+    transform: translateY(-1px);
+}
+
+#file-name {
+    color: #6b7280;
+    font-size: 0.95rem;
+}
+
+.form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.form-actions .btn {
+    min-width: 140px;
+}
+
+.btn-primary {
+    background: #2563eb;
+}
+
+.btn-secondary {
+    background: #6b7280;
+}
+
+@media (max-width: 900px) {
+    .profile-header {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .profile-actions {
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleEditMode() {
+    const form = document.getElementById('edit-form');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+document.getElementById('profile_photo').addEventListener('change', function(e) {
+    const fileName = e.target.files[0] ? e.target.files[0].name : 'No file chosen';
+    document.getElementById('file-name').textContent = fileName;
+});
+</script>
+{% endblock %}

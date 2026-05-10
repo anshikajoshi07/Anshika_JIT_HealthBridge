@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HealthBridge - Admin Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar admin-navbar">
+        <div class="container">
+            <button class="navbar-toggle" id="navbarToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <ul class="navbar-menu" id="navbarMenu">
+                <li><a href="{% url 'health:admin_dashboard' %}" class="nav-link"><span>🏠</span> Dashboard</a></li>
+                <li><a href="{% url 'health:manage_patients' %}" class="nav-link"><span>👥</span> Manage Patients</a></li>
+                <li><a href="{% url 'health:manage_doctors' %}" class="nav-link"><span>👨‍⚕️</span> Manage Doctors</a></li>
+                <li><a href="{% url 'health:view_appointments' %}" class="nav-link"><span>📅</span> View Appointments</a></li>
+                <li><a href="{% url 'health:manage_system' %}" class="nav-link"><span>🔧</span> System Data</a></li>
+                <li><a href="{% url 'admin:index' %}" class="nav-link"><span>🛠️</span> Django Admin</a></li>
+                <li><a href="{% url 'health:signout' %}" class="nav-link"><span>🚪</span> Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+            <button type="button" class="close-alert">&times;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 HealthBridge Admin Panel. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        document.getElementById('navbarToggle').addEventListener('click', function() {
+            document.getElementById('navbarMenu').classList.toggle('active');
+        });
+
+        const closeButtons = document.querySelectorAll('.close-alert');
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                this.parentElement.style.display = 'none';
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

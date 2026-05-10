@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Account - HealthBridge{% endblock %}
+
+{% block content %}
+<div class="signup-container">
+    <!-- Account Type Selection -->
+    <div class="account-type-section">
+        <h2>Create Your Account</h2>
+        <p>Choose your account type to get started</p>
+        
+        <div class="account-type-selector">
+            <a href="{% url 'health:signup_patient' %}" class="type-option">
+                <div class="type-icon">👤</div>
+                <h3>Patient</h3>
+                <p>Book appointments and manage health records</p>
+            </a>
+            
+            <a href="{% url 'health:signup_doctor' %}" class="type-option">
+                <div class="type-icon">👨‍⚕️</div>
+                <h3>Doctor</h3>
+                <p>Manage appointments and patient consultations</p>
+            </a>
+        </div>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+.signup-container {
+    padding: 2rem 0;
+}
+
+.account-type-section {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.account-type-section h2 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+}
+
+.account-type-section p {
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+.account-type-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.type-option {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid #ddd;
+    transition: all 0.3s ease;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    color: inherit;
+}
+
+.type-option:hover {
+    border-color: var(--secondary-color);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.1);
+    transform: translateY(-5px);
+}
+
+.type-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.type-option h3 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.type-option p {
+    font-size: 0.9rem;
+    color: #999;
+}
+
+@media (max-width: 768px) {
+    .account-type-selector {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,319 @@
+{% extends 'basepatient.html' %}
+{% load static %}
+
+{% block title %}Search Doctors - HealthBridge{% endblock %}
+
+{% block content %}
+<div class="search-container">
+    <div class="search-header">
+        <h1>Find Your Doctor</h1>
+        <p>Search for healthcare professionals by name, specialty, or clinic.</p>
+    </div>
+
+    <!-- Search Form -->
+    <div class="search-form-card">
+        <form method="GET" class="search-form">
+            <div class="search-inputs">
+                <div class="search-input-group">
+                    <input type="text" name="q" value="{{ query }}" placeholder="Search by doctor name or clinic..." class="search-input">
+                </div>
+                <div class="search-input-group">
+                    <select name="specialization" class="search-select">
+                        <option value="">All Specializations</option>
+                        {% for spec in specializations %}
+                            <option value="{{ spec }}" {% if specialization == spec %}selected{% endif %}>{{ spec }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="search-btn">🔍 Search</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Search Results -->
+    <div class="results-section">
+        <div class="results-header">
+            <h2>Available Doctors {% if query or specialization %}({{ doctors|length }} found){% endif %}</h2>
+        </div>
+
+        {% if doctors %}
+            <div class="doctors-grid">
+                {% for doctor in doctors %}
+                    <div class="doctor-card">
+                        <div class="doctor-photo">
+                            {% if doctor.profile_photo %}
+                                <img src="{{ doctor.profile_photo.url }}" alt="Dr. {{ doctor.user.first_name }}">
+                            {% else %}
+                                <div class="default-doctor-photo">
+                                    <span>Dr. {{ doctor.user.first_name|first|upper }}{{ doctor.user.last_name|first|upper }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="doctor-info">
+                            <h3>Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</h3>
+                            {% if doctor.specialization %}
+                                <p class="specialization">{{ doctor.specialization }}</p>
+                            {% endif %}
+                            {% if doctor.clinic_name %}
+                                <p class="clinic">{{ doctor.clinic_name }}</p>
+                            {% endif %}
+                            {% if doctor.experience %}
+                                <p class="experience">{{ doctor.experience }} years experience</p>
+                            {% endif %}
+                            {% if doctor.consultation_fee %}
+                                <p class="fee">₹{{ doctor.consultation_fee }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="doctor-actions">
+                            <a href="{% url 'health:doctor_detail' doctor.id %}" class="btn-view">View Details</a>
+                            <a href="{% url 'health:book_appointment_with_doctor' doctor.id %}" class="btn-book">Book Appointment</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-results">
+                <div class="no-results-icon">👨‍⚕️</div>
+                <h3>No doctors found</h3>
+                <p>Try adjusting your search criteria or browse all available doctors.</p>
+                <a href="{% url 'health:search_doctors' %}" class="btn-primary">Clear Search</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.search-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1.25rem;
+}
+
+.search-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.search-header h1 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.search-header p {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.search-form-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+    margin-bottom: 2rem;
+}
+
+.search-form {
+    width: 100%;
+}
+
+.search-inputs {
+    display: grid;
+    grid-template-columns: 2fr 1fr auto;
+    gap: 1rem;
+    align-items: end;
+}
+
+.search-input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.search-input, .search-select {
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.search-input:focus, .search-select:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.search-btn {
+    background: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.search-btn:hover {
+    background: #2980b9;
+}
+
+.results-section {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+
+.results-header h2 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+}
+
+.doctors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.doctor-card {
+    background: #f8f9fa;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+.doctor-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.doctor-photo {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.doctor-photo img, .default-doctor-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--secondary-color);
+}
+
+.default-doctor-photo {
+    background: linear-gradient(135deg, var(--secondary-color), #4f5b7b);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.doctor-info h3 {
+    color: var(--primary-color);
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+}
+
+.doctor-info p {
+    margin: 0.25rem 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.specialization {
+    color: var(--secondary-color);
+    font-weight: 600;
+}
+
+.fee {
+    color: #27ae60;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.doctor-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-view, .btn-book {
+    flex: 1;
+    padding: 0.6rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    text-align: center;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.btn-view {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-view:hover {
+    background: #5a6268;
+}
+
+.btn-book {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.btn-book:hover {
+    background: #2980b9;
+}
+
+.no-results {
+    text-align: center;
+    padding: 3rem;
+}
+
+.no-results-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.no-results h3 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.no-results p {
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+.btn-primary {
+    display: inline-block;
+    background: var(--secondary-color);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .search-inputs {
+        grid-template-columns: 1fr;
+    }
+
+    .doctors-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .doctor-actions {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}

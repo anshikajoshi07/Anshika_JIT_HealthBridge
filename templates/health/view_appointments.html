@@ -1,0 +1,148 @@
+{% extends 'base.admin.html' %}
+{% load static %}
+
+{% block title %}View Appointments - HealthBridge Admin{% endblock %}
+
+{% block content %}
+<div class="manage-container">
+    <div class="manage-header">
+        <h1>View Appointments</h1>
+        <p>Monitor all appointments in the system.</p>
+    </div>
+
+    {% if appointments %}
+        <div class="data-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Patient</th>
+                        <th>Doctor</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in appointments %}
+                        <tr>
+                            <td>{{ appointment.patient.user.first_name }} {{ appointment.patient.user.last_name }}</td>
+                            <td>Dr. {{ appointment.doctor.user.first_name }} {{ appointment.doctor.user.last_name }}</td>
+                            <td>{{ appointment.appointment_date }}</td>
+                            <td>{{ appointment.appointment_time }}</td>
+                            <td>
+                                <span class="status status-{{ appointment.status }}">{{ appointment.status|title }}</span>
+                            </td>
+                            <td>
+                                <a href="{% url 'health:view_appointment' appointment.id %}" class="btn btn-sm btn-secondary">View</a>
+                                <a href="{% url 'health:edit_appointment' appointment.id %}" class="btn btn-sm btn-primary">Edit</a>
+                                {% if appointment.status == 'pending' %}
+                                    <a href="{% url 'health:approve_appointment' appointment.id %}" class="btn btn-sm btn-success" onclick="return confirm('Approve this appointment?')">Approve</a>
+                                    <a href="{% url 'health:reject_appointment' appointment.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Reject this appointment?')">Reject</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="no-data">
+            <p>No appointments found.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.manage-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1.25rem;
+}
+
+.manage-header {
+    margin-bottom: 2rem;
+}
+
+.manage-header h1 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.data-table {
+    background: white;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+    background: #f9fafb;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.status-pending {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.status-confirmed {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.status-completed {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-cancelled {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.btn-success {
+    background: #10b981;
+    color: white;
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.no-data {
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+</style>
+{% endblock %}

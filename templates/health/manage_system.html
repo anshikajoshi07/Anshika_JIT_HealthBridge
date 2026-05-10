@@ -1,0 +1,111 @@
+{% extends 'base.admin.html' %}
+{% load static %}
+
+{% block title %}Manage System - HealthBridge Admin{% endblock %}
+
+{% block content %}
+<div class="manage-container">
+    <div class="manage-header">
+        <h1>Manage System Data</h1>
+        <p>Access and manage system-wide data and settings.</p>
+    </div>
+
+    <div class="system-cards">
+        <div class="system-card">
+            <div class="card-icon">📊</div>
+            <h3>System Statistics</h3>
+            <p>View detailed system analytics and reports.</p>
+            <a href="#" class="btn btn-primary">View Stats</a>
+        </div>
+
+        <div class="system-card">
+            <div class="card-icon">🔧</div>
+            <h3>System Settings</h3>
+            <p>Configure application settings and preferences.</p>
+            <a href="#" class="btn btn-primary">Configure</a>
+        </div>
+
+        <div class="system-card">
+            <div class="card-icon">📁</div>
+            <h3>Data Backup</h3>
+            <p>Manage data backups and restore operations.</p>
+            <a href="#" class="btn btn-primary">Backup</a>
+        </div>
+
+        <div class="system-card">
+            <div class="card-icon">🔔</div>
+            <h3>Notifications</h3>
+            <p>Configure system notifications and alerts.</p>
+            <a href="#" class="btn btn-primary">Manage</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.manage-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1.25rem;
+}
+
+.manage-header {
+    margin-bottom: 2rem;
+}
+
+.manage-header h1 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.system-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.system-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.system-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.system-card h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.system-card p {
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: var(--secondary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+.btn:hover {
+    background: #2980b9;
+}
+</style>
+{% endblock %}

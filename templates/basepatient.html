@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HealthBridge - Patient Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar patient-navbar">
+        <div class="container">
+            <div class="navbar-brand">
+                <a href="{% url 'health:index' %}">
+                    <span class="brand-icon">🏥</span> HealthBridge
+                </a>
+            </div>
+
+            <button class="navbar-toggle" id="navbarToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <ul class="navbar-menu" id="navbarMenu">
+                <li><a href="{% url 'health:index' %}" class="nav-link"><span>🏠</span> Dashboard</a></li>
+                <li><a href="{% url 'health:book_appointment' %}" class="nav-link"><span>📅</span> Book Appointment</a></li>
+                <li><a href="{% url 'health:health_records' %}" class="nav-link"><span>📊</span> Health Records</a></li>
+                <li><a href="{% url 'health:my_prescriptions' %}" class="nav-link"><span>💊</span> Prescriptions</a></li>
+                
+                <li class="nav-divider"></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+            <button type="button" class="close-alert">&times;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 HealthBridge. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        // Mobile navbar toggle
+        document.getElementById('navbarToggle').addEventListener('click', function() {
+            document.getElementById('navbarMenu').classList.toggle('active');
+        });
+
+        // Dropdown menu toggle
+        const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+        dropdownToggles.forEach(toggle => {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                this.parentElement.classList.toggle('active');
+            });
+        });
+
+        // Close alert messages
+        const closeButtons = document.querySelectorAll('.close-alert');
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                this.parentElement.style.display = 'none';
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
