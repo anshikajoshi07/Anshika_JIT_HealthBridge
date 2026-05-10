@@ -4,27 +4,21 @@ Django settings for healthcare project.
 
 import os
 from pathlib import Path
-from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-me-in-production')
+SECRET_KEY = os.getenv('SECRET_KEY', 'temp-secret-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-# ALLOWED_HOSTS configuration
-ALLOWED_HOSTS_STR = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,anshika-jit-healthbridge.onrender.com')
-ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',') if host.strip()]
+ALLOWED_HOSTS = ['*']
 
-# CSRF and security settings
 CSRF_TRUSTED_ORIGINS = [
-    'https://anshika-jit-healthbridge.onrender.com',
-    'http://localhost:8000',
-    'http://127.0.0.1:8000',
+    'https://*.onrender.com',
 ]
 
 
@@ -75,62 +69,22 @@ WSGI_APPLICATION = 'healthcare.wsgi.application'
 # Static files (CSS, JavaScript, Images)
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Database file path for persistent storage
-import sys
-if 'render' in sys.modules or os.getenv('RENDER'):
-    DB_PATH = '/var/data/db.sqlite3'
-else:
-    DB_PATH = BASE_DIR / 'db.sqlite3'
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': DB_PATH,
+        'NAME': os.getenv('DB_PATH', BASE_DIR / 'db.sqlite3'),
     }
 }
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# Logging configuration for production debugging
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO',
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-            'propagate': False,
-        },
-        'django.request': {
-            'handlers': ['console'],
-            'level': 'ERROR',
-            'propagate': False,
-        },
-    },
-}
 
 # Default primary key field type
 
