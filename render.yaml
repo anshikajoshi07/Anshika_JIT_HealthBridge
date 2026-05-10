@@ -3,7 +3,7 @@ services:
     name: healthbridge
     runtime: python3
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt
-    startCommand: python manage.py runserver 0.0.0.0:10000
+    startCommand: gunicorn healthcare.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: healthcare.settings
