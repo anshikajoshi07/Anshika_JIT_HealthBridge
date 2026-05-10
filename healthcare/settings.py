@@ -17,12 +17,12 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-me-in-producti
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 # ALLOWED_HOSTS configuration
-ALLOWED_HOSTS_STR = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,*.onrender.com')
-ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',')]
+ALLOWED_HOSTS_STR = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,anshika-jit-healthbridge.onrender.com')
+ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',') if host.strip()]
 
 # CSRF and security settings
 CSRF_TRUSTED_ORIGINS = [
-    'https://*.onrender.com',
+    'https://anshika-jit-healthbridge.onrender.com',
     'http://localhost:8000',
     'http://127.0.0.1:8000',
 ]
