@@ -3,7 +3,7 @@
     name: healthbridge
     runtime: python3
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
-    startCommand: python manage.py migrate --noinput --verbosity=1 && gunicorn healthcare.wsgi:application --bind 0.0.0.0:$PORT --log-level info
+    startCommand: gunicorn healthcare.wsgi:application --bind 0.0.0.0:$PORT --log-level debug
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: healthcare.settings
