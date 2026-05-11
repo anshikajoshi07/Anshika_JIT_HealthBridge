@@ -78,14 +78,10 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-DATABASE_NAME = os.getenv('DB_PATH', BASE_DIR / 'db.sqlite3')
-if os.getenv('RENDER') == '1':
-    DATABASE_NAME = '/tmp/db.sqlite3'
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': DATABASE_NAME,
+        'NAME': '/var/data/db.sqlite3',
     }
 }
 
