@@ -2,12 +2,8 @@
   - type: web
     name: healthbridge
     runtime: python3
-    disk:
-      name: data
-      mountPath: /var/data
-      sizeGb: 1
-    buildCommand: mkdir -p /var/data && pip install -r requirements.txt && python manage.py migrate --noinput && python manage.py collectstatic --noinput
-    startCommand: mkdir -p /var/data && chmod 777 /var/data && touch /var/data/db.sqlite3 && python manage.py migrate --noinput && gunicorn healthcare.wsgi:application --bind 0.0.0.0:$PORT
+    buildCommand: pip install -r requirements.txt && python manage.py migrate --noinput && python manage.py collectstatic --noinput
+    startCommand: python manage.py migrate --noinput && gunicorn healthcare.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: healthcare.settings
@@ -18,7 +14,7 @@
       - key: RENDER
         value: "1"
       - key: DB_PATH
-        value: /var/data/db.sqlite3
+        value: /tmp/db.sqlite3
       - key: DJANGO_SUPERUSER_USERNAME
         value: admin
       - key: DJANGO_SUPERUSER_EMAIL
