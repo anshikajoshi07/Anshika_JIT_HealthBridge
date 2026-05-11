@@ -324,17 +324,20 @@ def signin(request):
         password = request.POST.get('password')
         
         try:
-            user = User.objects.get(email=email)
-            user = authenticate(request, username=user.username, password=password)
-            
-            if user is not None:
-                login(request, user)
-                messages.success(request, 'Successfully signed in!')
-                return redirect('health:index')
+            user = User.objects.filter(email=email).first()
+            if user:
+                user = authenticate(request, username=user.username, password=password)
+                
+                if user is not None:
+                    login(request, user)
+                    messages.success(request, 'Successfully signed in!')
+                    return redirect('health:index')
+                else:
+                    messages.error(request, 'Invalid email or password.')
             else:
-                messages.error(request, 'Invalid email or password.')
-        except User.DoesNotExist:
-            messages.error(request, 'User not found.')
+                messages.error(request, 'User not found.')
+        except Exception as e:
+            messages.error(request, 'An error occurred during sign in.')
     
     return render(request, 'health/signin.html')
 
