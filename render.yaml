@@ -21,7 +21,3 @@
         value: admin@healthbridge.com
       - key: DJANGO_SUPERUSER_PASSWORD
         value: admin123
-    disk:
-      name: healthbridge_disk
-      mountPath: /var/data
-      sizeGB: 1
