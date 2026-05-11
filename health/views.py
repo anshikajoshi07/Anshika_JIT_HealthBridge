@@ -320,23 +320,30 @@ def reject_appointment(request, appointment_id):
 def signin(request):
     """Sign in view."""
     if request.method == 'POST':
+        print("DEBUG: Signin POST received")
         email = request.POST.get('email')
         password = request.POST.get('password')
+        print(f"DEBUG: Email: {email}")
         
         try:
             user = User.objects.filter(email=email).first()
             if user:
+                print(f"DEBUG: User found: {user.username}")
                 user = authenticate(request, username=user.username, password=password)
                 
                 if user is not None:
+                    print("DEBUG: Authentication successful")
                     login(request, user)
                     messages.success(request, 'Successfully signed in!')
                     return redirect('health:index')
                 else:
+                    print("DEBUG: Authentication failed")
                     messages.error(request, 'Invalid email or password.')
             else:
+                print("DEBUG: User not found")
                 messages.error(request, 'User not found.')
         except Exception as e:
+            print(f"DEBUG: Exception in signin: {e}")
             messages.error(request, 'An error occurred during sign in.')
     
     return render(request, 'health/signin.html')
@@ -350,6 +357,7 @@ def signup(request):
 def signup_patient(request):
     """Patient signup view."""
     if request.method == 'POST':
+        print("DEBUG: Signup patient POST received")
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
@@ -358,6 +366,7 @@ def signup_patient(request):
         blood_group = request.POST.get('blood_group')
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
+        print(f"DEBUG: Email: {email}, First: {first_name}")
         
         # Validations
         if password != confirm_password:
@@ -374,6 +383,7 @@ def signup_patient(request):
         
         # Create user
         try:
+            print("DEBUG: Creating user")
             username = email.split('@')[0]
             # Make username unique if needed
             base_username = username
@@ -389,6 +399,7 @@ def signup_patient(request):
                 first_name=first_name,
                 last_name=last_name
             )
+            print(f"DEBUG: User created: {user.username}")
             
             # Create patient profile
             from .models import PatientProfile
@@ -398,6 +409,7 @@ def signup_patient(request):
                 age=int(age) if age and age.isdigit() else None,
                 blood_group=blood_group if blood_group else None
             )
+            print("DEBUG: Patient profile created")
             
             # Log in the user
             login(request, user)
@@ -405,6 +417,7 @@ def signup_patient(request):
             return redirect('health:index')
             
         except Exception as e:
+            print(f"DEBUG: Exception in signup_patient: {e}")
             messages.error(request, f'Error creating account: {str(e)}')
             return render(request, 'health/signup_patient.html')
     
