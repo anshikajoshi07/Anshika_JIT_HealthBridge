@@ -2,6 +2,10 @@
   - type: web
     name: healthbridge
     runtime: python3
+    disk:
+      name: data
+      mountPath: /var/data
+      sizeGb: 1
     buildCommand: mkdir -p /var/data && pip install -r requirements.txt && python manage.py migrate --noinput && python manage.py collectstatic --noinput
     startCommand: mkdir -p /var/data && chmod 777 /var/data && touch /var/data/db.sqlite3 && python manage.py migrate --noinput && gunicorn healthcare.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
