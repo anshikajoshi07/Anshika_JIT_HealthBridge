@@ -13,6 +13,8 @@
         value: "False"
       - key: RENDER
         value: "1"
+      - key: MEDIA_ROOT
+        value: /var/data/media
       - key: DJANGO_SUPERUSER_USERNAME
         value: anshika
       - key: DJANGO_SUPERUSER_EMAIL
