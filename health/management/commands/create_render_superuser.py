@@ -14,25 +14,32 @@ class Command(BaseCommand):
         email = os.getenv('DJANGO_SUPERUSER_EMAIL', 'anshika@gmail.com')
         password = os.getenv('DJANGO_SUPERUSER_PASSWORD', 'anshika')
 
-        identifier = {User.USERNAME_FIELD: username} if User.USERNAME_FIELD != 'email' else {'email': email}
-        if User.objects.filter(email=email).exists() or User.objects.filter(**identifier).exists():
+        username_field = getattr(User, 'USERNAME_FIELD', 'username')
+        has_email_field = any(field.name == 'email' for field in User._meta.fields)
+
+        identifier = {username_field: username}
+        if has_email_field:
+            identifier['email'] = email
+
+        if User.objects.filter(**identifier).exists():
             self.stdout.write(self.style.SUCCESS('Superuser already exists.'))
             return
 
-        create_kwargs = {
-            'email': email,
-            'password': password,
-        }
+        create_kwargs = {'password': password}
 
-        if User.USERNAME_FIELD != 'email':
-            create_kwargs['username'] = username
+        if username_field != 'email':
+            create_kwargs[username_field] = username
+            if has_email_field:
+                create_kwargs['email'] = email
+        else:
+            create_kwargs['email'] = email
 
         try:
             User.objects.create_superuser(**create_kwargs)
             self.stdout.write(self.style.SUCCESS(f'Superuser created: {email}'))
         except TypeError:
-            if 'username' in create_kwargs:
-                create_kwargs.pop('username')
+            if username_field != 'email' and username_field in create_kwargs:
+                create_kwargs.pop(username_field)
                 User.objects.create_superuser(**create_kwargs)
                 self.stdout.write(self.style.SUCCESS(f'Superuser created: {email}'))
             else:

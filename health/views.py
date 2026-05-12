@@ -1,5 +1,7 @@
+import os
+
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -509,6 +511,67 @@ def signup_doctor(request):
             return render(request, 'health/signup_doctor.html')
     
     return render(request, 'health/signup_doctor.html')
+
+
+def signup_admin(request):
+    """Admin signup view for auto-creating the superuser."""
+    User = get_user_model()
+
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
+        admin_email = os.getenv('DJANGO_SUPERUSER_EMAIL', 'anshika@gmail.com')
+        admin_username = os.getenv('DJANGO_SUPERUSER_USERNAME', 'anshika')
+        admin_password = os.getenv('DJANGO_SUPERUSER_PASSWORD', 'anshika')
+
+        if email.lower() != admin_email.lower():
+            messages.error(request, 'Admin signup is only allowed for the configured admin email.')
+            return render(request, 'health/signup_admin.html')
+
+        if password != confirm_password:
+            messages.error(request, 'Passwords do not match.')
+            return render(request, 'health/signup_admin.html')
+
+        if password != admin_password:
+            messages.error(request, 'Password does not match the configured admin password.')
+            return render(request, 'health/signup_admin.html')
+
+        username_field = getattr(User, 'USERNAME_FIELD', 'username')
+        identifier = {username_field: admin_username}
+        if hasattr(User, 'email'):
+            identifier['email'] = admin_email
+
+        if User.objects.filter(**identifier).exists():
+            messages.success(request, 'Admin account already exists. Please sign in.')
+            return redirect('health:signin')
+
+        try:
+            create_kwargs = {'password': admin_password}
+            if username_field != 'email':
+                create_kwargs[username_field] = admin_username
+                if hasattr(User, 'email'):
+                    create_kwargs['email'] = admin_email
+            else:
+                create_kwargs['email'] = admin_email
+
+            if hasattr(User, 'first_name'):
+                create_kwargs['first_name'] = first_name
+            if hasattr(User, 'last_name'):
+                create_kwargs['last_name'] = last_name
+
+            user = User.objects.create_superuser(**create_kwargs)
+            login(request, user)
+            messages.success(request, 'Admin account created successfully!')
+            return redirect('health:admin_dashboard')
+        except Exception as e:
+            messages.error(request, f'Error creating admin account: {str(e)}')
+            return render(request, 'health/signup_admin.html')
+
+    return render(request, 'health/signup_admin.html')
 
 
 @login_required(login_url='health:signin')

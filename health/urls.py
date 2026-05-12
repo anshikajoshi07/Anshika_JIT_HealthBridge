@@ -23,6 +23,7 @@ urlpatterns = [
     path('signup/', views.signup, name='signup'),
     path('signup/patient/', views.signup_patient, name='signup_patient'),
     path('signup/doctor/', views.signup_doctor, name='signup_doctor'),
+    path('signup/admin/', views.signup_admin, name='signup_admin'),
     path('signout/', views.signout, name='signout'),
     path('logout/', views.signout, name='logout'),
     path('profile/', views.profile, name='profile'),
