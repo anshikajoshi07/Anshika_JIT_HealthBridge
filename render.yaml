@@ -2,6 +2,9 @@
   - type: web
     name: healthbridge
     runtime: python3
+    disk:
+      mountPath: /var/data
+      sizeGB: 10
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput --clear
     startCommand: python manage.py migrate --noinput && python manage.py create_render_superuser && gunicorn healthcare.wsgi:application --bind 0.0.0.0:$PORT --log-level info
     envVars:
