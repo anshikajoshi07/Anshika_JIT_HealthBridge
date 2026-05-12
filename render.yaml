@@ -3,7 +3,7 @@
     name: healthbridge
     runtime: python3
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
-    startCommand: gunicorn healthcare.wsgi:application --bind 0.0.0.0:$PORT --log-level info
+    startCommand: python manage.py migrate --noinput && python manage.py create_render_superuser && gunicorn healthcare.wsgi:application --bind 0.0.0.0:$PORT --log-level info
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: healthcare.settings
@@ -14,8 +14,8 @@
       - key: RENDER
         value: "1"
       - key: DJANGO_SUPERUSER_USERNAME
-        value: admin
+        value: anshika
       - key: DJANGO_SUPERUSER_EMAIL
-        value: admin@healthbridge.com
+        value: anshika@gmail.com
       - key: DJANGO_SUPERUSER_PASSWORD
-        value: admin123
+        value: anshika
