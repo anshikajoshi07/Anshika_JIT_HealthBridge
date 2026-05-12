@@ -101,13 +101,6 @@ if DATABASE_URL:
             ssl_require=not DEBUG,
         )
     }
-elif os.getenv('RENDER') == '1':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': '/tmp/db.sqlite3',
-        }
-    }
 else:
     DATABASES = {
         'default': {
