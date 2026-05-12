@@ -8,6 +8,27 @@ from django.db import models
 from .models import PatientProfile, DoctorProfile, Appointment
 
 
+def get_user_role(user):
+    if user.is_superuser or user.is_staff:
+        return 'admin'
+    if hasattr(user, 'doctor_profile'):
+        return 'doctor'
+    if hasattr(user, 'patient_profile'):
+        return 'patient'
+    return 'user'
+
+
+def role_redirect(user):
+    role = get_user_role(user)
+    if role == 'admin':
+        return redirect('health:admin_dashboard')
+    if role == 'doctor':
+        return redirect('health:index')
+    if role == 'patient':
+        return redirect('health:index')
+    return redirect('health:index')
+
+
 def index(request):
     """Health app home page."""
     if request.user.is_authenticated:
@@ -319,33 +340,31 @@ def reject_appointment(request, appointment_id):
 
 def signin(request):
     """Sign in view."""
+    if request.user.is_authenticated:
+        return role_redirect(request.user)
+
     if request.method == 'POST':
-        print("DEBUG: Signin POST received")
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        print(f"DEBUG: Email: {email}")
-        
-        try:
-            user = User.objects.filter(email=email).first()
-            if user:
-                print(f"DEBUG: User found: {user.username}")
-                user = authenticate(request, username=user.username, password=password)
-                
-                if user is not None:
-                    print("DEBUG: Authentication successful")
-                    login(request, user)
-                    messages.success(request, 'Successfully signed in!')
-                    return redirect('health:index')
-                else:
-                    print("DEBUG: Authentication failed")
-                    messages.error(request, 'Invalid email or password.')
-            else:
-                print("DEBUG: User not found")
-                messages.error(request, 'User not found.')
-        except Exception as e:
-            print(f"DEBUG: Exception in signin: {e}")
-            messages.error(request, 'An error occurred during sign in.')
-    
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '')
+
+        if not email or not password:
+            messages.error(request, 'Please enter both email and password.')
+            return render(request, 'health/signin.html')
+
+        user = User.objects.filter(email__iexact=email).first()
+        if user:
+            authenticated_user = authenticate(request, username=user.username, password=password)
+            if authenticated_user is not None:
+                if not authenticated_user.is_active:
+                    messages.error(request, 'Account is disabled. Contact support.')
+                    return render(request, 'health/signin.html')
+
+                login(request, authenticated_user)
+                messages.success(request, 'Successfully signed in!')
+                return role_redirect(authenticated_user)
+
+        messages.error(request, 'Invalid email or password.')
+
     return render(request, 'health/signin.html')
 
 

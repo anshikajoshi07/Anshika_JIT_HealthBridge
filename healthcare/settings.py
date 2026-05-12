@@ -22,6 +22,13 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.onrender.com',
 ]
 
+LOGIN_URL = 'health:signin'
+LOGIN_REDIRECT_URL = 'health:index'
+LOGOUT_REDIRECT_URL = 'health:index'
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 
 # Application definition
 
