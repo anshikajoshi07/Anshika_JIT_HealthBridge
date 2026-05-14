@@ -86,18 +86,26 @@ SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 X_FRAME_OPTIONS = 'DENY'
 
-# Media files - Render persistent disk at /var/data
+# Media files - Render persistent disk or local development
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/var/data/media'
+if os.getenv('RENDER'):
+    MEDIA_ROOT = Path('/var/data/media')
+else:
+    MEDIA_ROOT = BASE_DIR / 'media'
+    MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 
-# Database - Render persistent disk at /var/data
+# Database - Render persistent disk or local development
+if os.getenv('RENDER'):
+    DATABASE_PATH = '/var/data/db.sqlite3'
+else:
+    DATABASE_PATH = BASE_DIR / 'db.sqlite3'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/var/data/db.sqlite3',
+        'NAME': DATABASE_PATH,
     }
 }
-
 
 # Default primary key field type
 
