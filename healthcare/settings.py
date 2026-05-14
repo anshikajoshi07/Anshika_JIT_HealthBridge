@@ -16,11 +16,10 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-temp-key-change-in-product
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://*.onrender.com',
-]
+# Use DATABASE_URL in production, while keeping SQLite as a local fallback.
+# DATABASE_URL should be set by Railway for PostgreSQL.
 
 LOGIN_URL = 'health:signin'
 LOGIN_REDIRECT_URL = 'health:index'
@@ -92,12 +91,15 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 
-# Database - PostgreSQL on Render, SQLite locally
+# Database - PostgreSQL on Railway, SQLite locally
 DATABASES = {
     'default': dj_database_url.config(
-        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
+        default=os.getenv("DATABASE_URL"),
         conn_max_age=600,
-    )
+    ) or {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
 # Default primary key field type
