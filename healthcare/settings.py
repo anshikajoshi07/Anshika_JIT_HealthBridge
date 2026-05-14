@@ -3,6 +3,7 @@ Django settings for healthcare project.
 """
 
 import os
+import dj_database_url
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -86,25 +87,17 @@ SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 X_FRAME_OPTIONS = 'DENY'
 
-# Media files - Render persistent disk or local development
+# Media files
 MEDIA_URL = '/media/'
-if os.getenv('RENDER'):
-    MEDIA_ROOT = Path('/var/data/media')
-else:
-    MEDIA_ROOT = BASE_DIR / 'media'
-    MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 
-# Database - Render persistent disk or local development
-if os.getenv('RENDER'):
-    DATABASE_PATH = '/var/data/db.sqlite3'
-else:
-    DATABASE_PATH = BASE_DIR / 'db.sqlite3'
-
+# Database - PostgreSQL on Render, SQLite locally
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': DATABASE_PATH,
-    }
+    'default': dj_database_url.config(
+        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
+        conn_max_age=600,
+    )
 }
 
 # Default primary key field type
