@@ -191,6 +191,36 @@ body {
 
     .navbar-menu a {
         padding: 0.5rem 0;
+    }
+}
+
+/* Tablet and phone layout */
+@media (max-width: 992px) {
+    .navbar .container {
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+
+    .navbar-menu {
+        width: 100%;
+    }
+
+    .navbar-menu.active {
+        display: flex;
+        max-height: 999px;
+    }
+
+    .navbar-menu li {
+        width: 100%;
+    }
+
+    .navbar-menu a {
+        width: 100%;
+    }
+}
+
+    .navbar-menu a {
+        padding: 0.5rem 0;
         font-size: 1rem;
     }
 

@@ -15,7 +15,14 @@
             <div class="navbar-brand">
                 <a href="{% url 'health:index' %}">HealthBridge</a>
             </div>
-            <ul class="navbar-menu">
+
+            <button class="navbar-toggle" id="navbarToggle" aria-label="Open navigation menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <ul class="navbar-menu" id="navbarMenu">
                 <li><a href="{% url 'health:index' %}">Home</a></li>
                 {% if user.is_authenticated %}
                     <li><a href="/admin/">Admin</a></li>
@@ -55,6 +62,17 @@
     </footer>
 
     <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        const navbarToggle = document.getElementById('navbarToggle');
+        const navbarMenu = document.getElementById('navbarMenu');
+
+        if (navbarToggle && navbarMenu) {
+            navbarToggle.addEventListener('click', function() {
+                navbarMenu.classList.toggle('active');
+                navbarToggle.classList.toggle('active');
+            });
+        }
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
