@@ -1,3 +1,9 @@
 {
-  "start": "gunicorn healthcare.wsgi"
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "dockerfile"
+  },
+  "deploy": {
+    "startCommand": "gunicorn healthcare.wsgi:application --bind 0.0.0.0:8000"
+  }
 }
