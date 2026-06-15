@@ -34,4 +34,4 @@ RUN python manage.py collectstatic --noinput || true
 EXPOSE 8000
 
 # Run gunicorn
-CMD ["gunicorn", "healthcare.wsgi:application", "--bind", "0.0.0.0:$PORT", "--workers", "4", "--worker-class", "sync", "--timeout", "60"]
+CMD gunicorn healthcare.wsgi:application --bind 0.0.0.0:$PORT --workers 4 --worker-class sync --timeout 60
