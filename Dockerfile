@@ -37,5 +37,5 @@ RUN chmod +x ./start.sh
 # Expose port
 EXPOSE 8000
 
-# Run startup script
-CMD ["./start.sh"]
+# Run startup script (shell form for proper $PORT expansion)
+CMD sh ./start.sh
