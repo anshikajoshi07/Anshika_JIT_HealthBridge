@@ -1,1 +1,1 @@
-web: python manage.py migrate && gunicorn healthcare.wsgi:application --bind 0.0.0.0:$PORT
+web: sh ./start.sh

@@ -30,8 +30,12 @@ RUN mkdir -p /app/staticfiles /app/media
 # Collect static files
 RUN python manage.py collectstatic --noinput || true
 
+# Copy startup script and make executable
+COPY start.sh .
+RUN chmod +x ./start.sh
+
 # Expose port
 EXPOSE 8000
 
-# Run gunicorn
-CMD gunicorn healthcare.wsgi:application --bind 0.0.0.0:$PORT --workers 4 --worker-class sync --timeout 60
+# Run startup script
+CMD ["./start.sh"]
