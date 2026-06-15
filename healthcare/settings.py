@@ -16,7 +16,18 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-temp-key-change-in-product
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'web-production-6a647.up.railway.app',
+    'localhost',
+    '127.0.0.1',
+    '0.0.0.0',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://web-production-6a647.up.railway.app',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
 
 # Use DATABASE_URL in production, while keeping SQLite as a local fallback.
 # DATABASE_URL should be set by Railway for PostgreSQL.
@@ -79,7 +90,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # Disabled for local dev
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 SECURE_SSL_REDIRECT = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
